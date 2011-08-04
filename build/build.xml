@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="community_acl" default="build_all" basedir="build" description="corePHP Community Acl">
+    
+    <!-- Default property file -->
+    <property file="build.properties"/>
+    
+    <!-- Default filesets to be used to move files -->
+    <fileset dir="../administrator/components/com_community_acl" id="admin_files">
+        <include name="**"/>        
+        <exclude name="*.ini"/>
+        <exclude name="backup/"/>
+    </fileset>
+	
+	<fileset dir="../components/com_community_acl" id="site_files">
+        <include name="community_acl.php"/>
+        <include name="index.html"/>
+    </fileset>
+    
+    <fileset dir="../administrator/language/en-GB" id="back_lang">
+        <include name="en-GB.com_community_acl.ini"/>
+    </fileset>
+    
+    <fileset dir="../language/en-GB" id="front_lang">
+        <include name="en-GB.plg_system_community_acl.ini"/>
+    </fileset>
+    
+    <fileset dir="../plugins/authentication" id="plug_redirect_acl">
+        <include name="community_acl.php"/>
+        <include name="community_acl.xml"/>
+    </fileset>
+    
+    <fileset dir="../plugins/system" id="plg_community_acl">
+        <include name="community_acl.php"/>
+        <include name="community_acl.xml"/>
+    </fileset>
+    
+    <fileset dir="../plugins/system" id="sys_cacl_pre_plugin">
+        <include name="cacl_preprocessor.php"/>
+        <include name="cacl_preprocessor.xml"/>
+    </fileset>
+    
+    <fileset dir="../plugins/user" id="plug_user_community_acl">
+        <include name="community_acl.php"/>
+        <include name="community_acl.xml"/>
+    </fileset>
+
+    <fileset dir="../plugins/system" id="cacl_joomsocial">
+        <include name="cacl_joomsocial.php"/>
+        <include name="cacl_joomsocial.xml"/>
+    </fileset>
+	
+    <fileset dir="../plugins/system" id="cacl_docman">
+        <include name="cacl_docman.php"/>
+        <include name="cacl_docman.xml"/>
+    </fileset>
+
+    <fileset dir="../components/com_comprofiler/plugin/user/plug_communityaclregistrationplugin" id="plug_cacl_userreg">
+        <include name="userreg.php"/>
+        <include name="userreg.xml"/>
+        <include name="index.html"/>
+    </fileset>
+
+    <fileset dir=".." id="joomla_patch">
+        <include name="libraries/joomla/application/module/helper.php"/>
+        <include name="administrator/modules/mod_menu/helper.php"/>
+        <include name="modules/mod_mainmenu/helper.php"/>
+        <include name="modules/mod_mainmenu/legacy.php"/>
+    </fileset>
+
+    <fileset dir=".." id="reg_member_type">
+        <include name="components/com_user/views/register/tmpl/default.php"/>
+    </fileset>
+    
+    <target name="build_all" depends="build_dir, build_plugins" description="build installable component">
+        <echo>
+            Building installable packages
+        </echo>
+        <zip destfile="Community_ACL_${version}.zip" basedir="${temp_dir}"/>
+		<delete dir="${temp_dir}" />
+    </target>
+    
+    <target name="build_dir" description="build directory structure">
+        <echo>
+            Building install directory
+        </echo>
+        <mkdir dir="${temp_dir}/admin/"/>
+        <mkdir dir="${temp_dir}/site"/>
+        <!-- mkdir dir="../../temp/site/HTML override/com_user/register" / -->
+        <mkdir dir="${temp_dir}/languages/admin"/>
+        <mkdir dir="${temp_dir}/languages/site"/>
+        
+        <copy todir="${temp_dir}/admin">
+            <fileset refid="admin_files"/>
+        </copy>
+        
+        <copy todir="${temp_dir}/site">
+            <fileset refid="site_files"/>
+        </copy>
+        
+        <copy todir="${temp_dir}/languages/admin">
+            <fileset refid="back_lang"/>
+        </copy>
+        
+        <copy todir="${temp_dir}/languages/site">
+            <fileset refid="front_lang"/>
+        </copy>
+        
+        <move file="${temp_dir}/admin/community_acl.xml" todir="${temp_dir}" overwrite="true"/>
+        <move file="${temp_dir}/admin/install.community_acl.php" todir="${temp_dir}" overwrite="true"/>
+        <move file="${temp_dir}/admin/uninstall.community_acl.php" todir="${temp_dir}" overwrite="true"/>
+        
+    </target>
+    
+    <target name="build_plugins" description="test">
+        <echo>
+            Building Plugins
+        </echo>
+        
+        <!-- Build authentication plugin -->
+        <zip destfile="plug_redirect_acl.zip">
+            <fileset refid="plug_redirect_acl"/>
+        </zip>
+        <move file="plug_redirect_acl.zip" todir="${temp_dir}/site"/>
+        
+        <!-- CACL Preprocessor -->
+        <zip destfile="cacl_preprocessor.zip">
+            <fileset refid="sys_cacl_pre_plugin"/>
+        </zip>
+        <move file="cacl_preprocessor.zip" todir="${temp_dir}/site"/>
+        
+        <!-- User Plugin -->
+        <zip destfile="plug_user_community_acl.zip">
+            <fileset refid="plug_user_community_acl"/>
+        </zip>
+        <move file="plug_user_community_acl.zip" todir="${temp_dir}/site"/>
+        
+		<!-- jomSocial -->
+		<zip destfile="cacl_joomsocial.zip">
+            <fileset refid="cacl_joomsocial"/>
+        </zip>
+        <move file="cacl_joomsocial.zip" todir="${temp_dir}/site"/>
+		
+		<!-- DOCman -->
+		<zip destfile="cacl_docman_${DOCman_version}.zip">
+            <fileset refid="cacl_docman"/>
+        </zip>
+        <move file="cacl_docman_${DOCman_version}.zip" todir="${temp_dir}/.."/>
+		
+		<!-- User Registration -->
+		<zip destfile="plug_cacl_userreg.zip">
+            <fileset refid="plug_cacl_userreg"/>
+        </zip>
+        <move file="plug_cacl_userreg.zip" todir="${temp_dir}/site"/>
+		
+		<!-- Patch Files -->
+		<zip destfile="joomla_patch.zip">
+            <fileset refid="joomla_patch"/>
+        </zip>
+        <move file="joomla_patch.zip" todir="${temp_dir}/site"/>
+		
+		<!-- System Plugin -->
+		<zip destfile="plg_community_acl.zip">
+            <fileset refid="plg_community_acl"/>
+        </zip>
+        <move file="plg_community_acl.zip" todir="${temp_dir}/site"/>
+		
+		<!-- HTML override Helpers -->
+		<zip destfile="HTML_override.zip">
+            <fileset refid="reg_member_type"/>
+        </zip>
+        <move file="HTML_override.zip" todir="${temp_dir}/site"/>
+		 
+    </target>
+    
+    <target name="clean_build" description="clean build enviroment">
+        <echo>
+            Cleaning build enviroment
+        </echo>
+        <delete includeemptydirs="true">
+            <fileset dir=".">
+                <include name="${temp_dir}"/>
+                <include name="Community_ACL_${version}.zip"/>
+            </fileset>
+        </delete>
+    </target>
+</project>

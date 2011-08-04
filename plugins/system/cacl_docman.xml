@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system">
+    <name>System - Community ACL DOCman</name>
+    <author>‵corePHP′</author>
+    <creationDate>January 2011</creationDate>
+    <copyright>(C) 2011- ‵corePHP′ LLC.</copyright>
+    <license>GNU/GPL v2 http://www.gnu.org/licenses/gpl-2.0.html</license>
+    <authorEmail>Support@corePHP.com</authorEmail>
+    <authorUrl>www.corePHP.com</authorUrl>
+    <version>1.0.0</version>
+    <description>Restricts use of DOCman categories.</description>
+    <files>
+        <filename plugin="cacl_docman">cacl_docman.php</filename>
+    </files>
+    <params/>
+</install>

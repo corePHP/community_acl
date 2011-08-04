@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="system">
+	<name>System - Community ACL Preprocessor</name>
+	<author>Adam Stephen Docherty</author>
+	<creationDate>November 2009</creationDate>
+	<copyright>corePHP</copyright>
+	<license></license>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<version>0.0.1</version>
+	<description>Preprocessing Functionality for Community ACL</description>
+	
+	<files>
+		<filename plugin="cacl_preprocessor">cacl_preprocessor.php</filename>
+	</files>
+	
+	<params>
+	</params>
+</install>

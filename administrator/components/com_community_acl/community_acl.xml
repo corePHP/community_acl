@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install type="component" version="1.5.0">
+	<name>Community_ACL</name>
+	<author>corePHP</author>
+	<creationDate>November 2008</creationDate>
+	<copyright>Copyright 2009 (C) 'corePHP' LLC / corephp.com. All rights reserved.</copyright>
+    <license>GNU/GPLv2 http://www.gnu.org/licenses/gpl-2.0.html</license>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<version>1.3.14</version>
+	<description>Community ACL allows finer control over which users can access items on your site.</description>
+	
+	<install>
+		<sql>
+			<file driver="mysql" charset="utf8">install.sql</file>
+			<file driver="mysql">install.sql</file>
+		</sql>
+	</install>
+
+	<installfile>install.community_acl.php</installfile>
+
+	<uninstallfile>uninstall.community_acl.php</uninstallfile>
+	
+	
+	<languages>
+		<language tag="en-GB">languages/site/en-GB.plg_system_community_acl.ini</language>
+	</languages>
+	
+	<files folder="site">
+		<filename>index.html</filename>
+		<filename>community_acl.php</filename>
+		<filename>joomla_patch.zip</filename>
+		<filename>plg_community_acl.zip</filename>
+		<filename>plug_cacl_userreg.zip</filename>
+		<filename>plug_redirect_acl.zip</filename>
+		<filename>plug_user_community_acl.zip</filename>
+		<filename>cacl_joomsocial.zip</filename>
+		<filename>cacl_preprocessor.zip</filename>
+	</files>
+		
+	<administration>	
+		<!-- Administration Menu Section -->
+		<menu>Community ACL</menu>
+		<submenu>
+			<menu link="option=com_community_acl&amp;task=config">Configuration</menu>
+			<menu link="option=com_community_acl&amp;mode=manage_users">Users management</menu>
+			<menu link="option=com_community_acl&amp;task=list_sites">Sites management</menu>
+			<menu link="option=com_community_acl&amp;task=list_groups">Groups management</menu>
+			<menu link="option=com_community_acl&amp;task=list_roles">Roles management</menu>
+			<menu link="option=com_community_acl&amp;task=list_functions">Functions management</menu>
+			<menu link="option=com_community_acl&amp;task=about">Help</menu>
+		</submenu>
+		<languages>
+			<language tag="en-GB">languages/admin/en-GB.com_community_acl.ini</language>
+		</languages>
+		
+		<files folder="admin">
+			<filename>index.html</filename>
+			<filename>admin.community_acl.php</filename>
+			<filename>admin.community_acl.html.php</filename>
+			<filename>admin.community_acl.style.php</filename>
+			<filename>community_acl.class.php</filename>
+			<filename>community_acl.functions.php</filename>
+			<filename>controller.php</filename>
+			<filename>install.php</filename>
+			<filename>installer.helper.php</filename>
+			<filename>uninstall.php</filename>
+			<filename>toolbar.community_acl.php</filename>
+			<filename>community_acl.language.php</filename>
+			<filename>toolbar.community_acl.html.php</filename>
+			<filename>users.php</filename>
+			<filename>users.class.php</filename>
+			<filename>tables.php</filename>
+			<filename>install.sql</filename>			
+			<filename>config.xml</filename>
+			<filename>changelog.php</filename>
+			<filename>disclaimer.php</filename>
+			<!--<filename>en-GB.com_community_acl.ini</filename>-->
+			<filename>images/index.html</filename>
+			<filename>images/top_menu_bg.jpg</filename>
+			<filename>images/bottom_menu_bg.jpg</filename>
+			<filename>images/j_arrow.png</filename>
+			<filename>images/j_arrow_down.png</filename>
+			<filename>images/progress.gif</filename>
+
+
+			
+			<filename>js/index.html</filename>
+			<filename>js/jquery.pack.js</filename>
+			
+			<filename>models/index.html</filename>
+			<filename>models/author.xml</filename>
+			<filename>models/registered.xml</filename>
+			<filename>models/user.xml</filename>
+			
+			<filename>views/index.html</filename>
+			<filename>views/user/index.html</filename>
+			<filename>views/user/view.html.php</filename>
+			<filename>views/user/tmpl/index.html</filename>
+			<filename>views/user/tmpl/form.php</filename>
+			
+			<filename>views/users/index.html</filename>
+			<filename>views/users/view.html.php</filename>
+			<filename>views/users/tmpl/index.html</filename>
+			<filename>views/users/tmpl/default.php</filename>
+			
+			<!--<filename>backup/index.html</filename>-->
+		</files>
+	</administration>
+</install>

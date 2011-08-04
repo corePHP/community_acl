@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<install version="1.5" type="plugin" group="authentication">
+	<name>User - Community ACL</name>
+	<author>corePHP</author>
+	<creationDate>April 2008</creationDate>
+	<copyright>corePHP</copyright>
+	<license></license>
+	<authorEmail></authorEmail>
+	<authorUrl></authorUrl>
+	<version>1.0.5</version>
+	<description>Provides access to items functionality</description>
+
+	<files>
+		<filename plugin="community_acl">community_acl.php</filename>
+	</files>
+	<administration />
+	<params>
+	</params>
+</install>
