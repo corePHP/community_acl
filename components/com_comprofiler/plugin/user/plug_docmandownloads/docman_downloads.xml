@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cbinstall version="1.0.0" type="plugin" group="user">
+	<name>DOCman Downloads</name>
+	<author>corePHP</author>
+	<creationDate>Feb 28 2011</creationDate>
+	<copyright>(C) 2011 'corePHP'</copyright>
+	<license>GNU/GPL v2 http://www.gnu.org/licenses/gpl-2.0.html</license>
+	<authorEmail>support@corephp.com</authorEmail>
+	<authorUrl>www.corephp.com</authorUrl>
+	<version>1.0.0</version>
+	<description>Display DOCman downloads per user.</description>
+	<files>
+		<filename plugin="docman_downloads">docman_downloads.php</filename>
+		<filename>index.html</filename>
+	</files>
+    <params></params>
+	<tabs>
+		<tab name="DOCman" description="" class="getDOCmanDownloadsTab" fields="0" position="cb_head" displaytype="tab">
+			<params>
+			</params>
+			<fields>
+			</fields>
+		</tab>
+	</tabs>
+	<install>
+		<queries>
+		</queries>
+	</install>
+	<uninstall>
+	</uninstall>
+</cbinstall>
