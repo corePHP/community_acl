@@ -233,12 +233,13 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		return version_compare(phpversion(), '5', '>=') && extension_loaded('tidy') && version_compare(phpversion('tidy'), '2', '>=') && $config->useTidy == 'true';
 	}
 	function backendMenuAccess () {
-
+		
+		$config = new CACL_config($db);
+		$config->load();
+		
 		$this->_app = JFactory::getApplication();
 		$user_access = cacl_get_user_access($config);
 		$db =& JFactory::getDBO();
-		$config = new CACL_config($db);
-		$config->load();
 
 		if ( $this->doTidy() && $this->_app->getTemplate() == 'rt_missioncontrol_j15' ) {
 
