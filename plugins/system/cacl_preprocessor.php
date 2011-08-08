@@ -45,12 +45,12 @@ class plgSystemCacl_preprocessor extends JPlugin {
 
 	}
 	function onAfterRender () {
-	    $app =& JFactory::getApplication();
+		$app =& JFactory::getApplication();
 
-	    //adding cACL Activate
-	    if( FALSE === strpos($this->_caclConfig->activate, $app->getName())){
-	        return;
-	    }
+		//adding cACL Activate
+		if( FALSE === strpos($this->_caclConfig->activate, $app->getName())){
+			return;
+		}
 
 		if (!file_exists(JPATH_SITE.'/administrator/components/com_community_acl/community_acl.functions.php')) {
 			return false;
@@ -175,10 +175,10 @@ class plgSystemCacl_preprocessor extends JPlugin {
 						$tmpHtml = @preg_replace($pattern, '', $_html);
 
 						if ( preg_last_error() !== PREG_NO_ERROR || $tmpHtml == NULL ){
-						    JError::raiseError('100', JText::_('There was a problem with the cACL regular expressions. cacl_preprocessor.php: '.__LINE__));
+							JError::raiseError('100', JText::_('There was a problem with the cACL regular expressions. cacl_preprocessor.php: '.__LINE__));
 						} else {
-						    $_html = $tmpHtml;
-						    unset($tmpHtml);
+							$_html = $tmpHtml;
+							unset($tmpHtml);
 						}
 					}
 				}
@@ -189,25 +189,30 @@ class plgSystemCacl_preprocessor extends JPlugin {
 	}
 	function findElement (&$element, $itemId, $value) {
 		switch ($this->_app->getTemplate()) {
-		case 'rt_panacea_j15':
-			if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
-				$this->_toRemove[] = $element->value;
-			}
-			break;
-		case 'yoo_symphony5.5':
-			if ($element->name == 'a' && false !== strpos($element->attribute ['href'], 'Itemid='.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
-				$this->_toRemove[] = $element->getParent()->value;
-			}
-			break;
-		case 'yoo_enterprise':
-			if ($element->name == 'span' &&  1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
-				$this->_toRemove[] = $element->value;
-			}
-			break;
-		case 'yoo_studio':
-			break;
-		default:
-			if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
+			case 'rt_panacea_j15':
+				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
+					$this->_toRemove[] = $element->value;
+				}
+				break;
+			case 'yoo_symphony5.5':
+				if ($element->name == 'a' && false !== strpos($element->attribute ['href'], 'Itemid='.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
+					$this->_toRemove[] = $element->getParent()->value;
+				}
+				break;
+			case 'yoo_enterprise':
+				if ($element->name == 'span' &&  1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
+					$this->_toRemove[] = $element->value;
+				}
+				break;
+			case 'yoo_studio':
+				break;
+			case 'rt_missioncontrol_j15':
+				if ($element->name == 'li' && false === strpos($element->attribute['class'], 'root') && 1 === preg_match('/^<li[^>]*?><a[^>]*?href="[^"]*?option='.$value.'("|&){1}/', $element->value)) {
+					$this->_toRemove[] = $element->value;
+				}
+				break;
+			default:
+				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
 				$this->_toRemove[] = $element->value;
 				return;
 			}
@@ -221,7 +226,67 @@ class plgSystemCacl_preprocessor extends JPlugin {
 	function getThemeRegex ($theme) {
 		return $pattern;
 	}
+	function doTidy(){
+		$db =& JFactory::getDBO();
+		$config = new CACL_config($db);
+		$config->load();
+		return version_compare(phpversion(), '5', '>=') && extension_loaded('tidy') && version_compare(phpversion('tidy'), '2', '>=') && $config->useTidy == 'true';
+	}
 	function backendMenuAccess () {
+
+		$this->_app = JFactory::getApplication();
+		$user_access = cacl_get_user_access($config);
+		$db =& JFactory::getDBO();
+		$config = new CACL_config($db);
+		$config->load();
+
+		if ( $this->doTidy() && $this->_app->getTemplate() == 'rt_missioncontrol_j15' ) {
+
+			$config_options = array(
+			    'preserve-entities' => true,
+				'output-xhtml'    => true,
+				'newline'         => false,
+				'wrap'            => false,
+				'output-encoding'   => 'utf8',
+				'input-encoding'   => 'utf8',
+				'char-encoding'   => 'utf8'
+			);
+
+			$denyOrAllow = $config->default_action == 'deny' ? 'NOT IN' : 'IN';
+
+			$db->Execute('DROP TABLE IF EXISTS temp');
+			$db->Execute('CREATE TEMPORARY TABLE temp ( `option` VARCHAR(255) NOT NULL )');
+			$db->Execute("INSERT INTO temp (`option`) VALUES ('com_categories'),('com_sections'),('com_frontpage'),('com_content'),('com_media')");
+			$db->Execute("INSERT INTO temp (`option`) (SELECT DISTINCT `option` FROM #__components)");
+
+			// `name`='###' means it's a component
+			$query = "
+				SELECT DISTINCT `option` FROM temp
+				WHERE `option` {$denyOrAllow} (
+					SELECT DISTINCT `option` FROM #__community_acl_access
+					WHERE
+					(`group_id` IN (".implode(',',array_filter($user_access['groups'])).") && `isbackend`=1 && `name`='###')
+					||
+					(`role_id` IN (".implode(',',array_filter($user_access['roles'])).") && `isbackend`=1 && `name`='###')
+				)
+				&& `option` != ''";
+			$db->setQuery($query);
+			$componentList = $db->loadResultArray();
+			$db->Execute('DROP TABLE IF EXISTS temp');
+
+			$_html = JResponse::getBody();
+
+			foreach ($componentList as $componentName){
+				$_html = @tidy_parse_string($_html, $config_options);
+				$this->findElement($_html->body(), 0, $componentName);
+				$_html = str_replace($this->_toRemove, '', $_html);
+			}
+
+			JResponse::setBody($_html);
+			return;
+		}
+
+
 		$lang =& JFactory::getLanguage();
 		$user =& JFactory::getUser();
 		$db =& JFactory::getDBO();
@@ -266,7 +331,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		$postRegex = '<\/a><\/li>/s';
 		/*
 		 * Site SubMenu
-		 */
+		*/
 		if (!$canManageUsers) {
 			$pattern[] = $preRegex.JText::_('User Manager').$postRegex;
 		}
@@ -281,7 +346,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		/*
 		 * Menus SubMenu
-		 */
+		*/
 		if (!$manageMenuMan && !$manageTrash) {
 			$pattern[] = $preRegex.JText::_('Menus').$postRegex;
 		}
@@ -300,7 +365,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		/*
 		 * Content SubMenu
-		 */
+		*/
 		if (!$check_component_com_content && !$manageTrash && !$check_component_com_sections && !$check_component_com_categories && !$check_component_com_frontpage) {
 			$pattern[] = $preRegex.JText::_('Content').$postRegex;
 		}
@@ -321,7 +386,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		/*
 		 * Components SubMenu
-		 */
+		*/
 		$query = 'SELECT *'.' FROM #__components'.' WHERE '.$db->NameQuote('option').' <> "com_frontpage"'.' AND '.$db->NameQuote('option').' <> "com_media"'.' AND enabled = 1'.' ORDER BY ordering, name';
 		$db->setQuery($query);
 		$comps = $db->loadObjectList(); // component list
@@ -383,8 +448,8 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		//print_r($pattern);die();
 		/*
-		 * Extensions SubMenu
-		 */
+		* Extensions SubMenu
+		*/
 		if (!$check_component_com_installer && !$editAllModules && !$editAllPlugins && !$manageTemplates && !$manageLanguages) {
 			$pattern[] = $preRegex.JText::_('Extensions').$postRegex;
 		}
@@ -405,7 +470,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		/*
 		 * System SubMenu
-		 */
+		*/
 		if (!$canConfig && !$canCheckin && !$canMassMail && !$check_component_com_cache) {
 			$pattern[] = $preRegex.JText::_('Tools').$postRegex;
 		}
@@ -427,7 +492,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		/*
 		 * Help SubMenu
-		 */
+		*/
 		if (!$check_component_com_admin) {
 			$pattern[] = $preRegex.JText::_('Help').$postRegex;
 			$pattern[] = $preRegex.JText::_('Joomla\! Help').$postRegex;
@@ -460,19 +525,19 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		$db->setQuery($query);
 		/*
 		 // Kobby updated to check for specific managers - Catgory, Section and Frontpage Managers
-		 if(( $option == 'com_categories' || $option == 'com_sections' || $option == 'com_frontpage' )){
-		 //Continue...
-		 }else{
-		 if ((int)$db->loadResult() < 1 )
-		 return true;
-		 }
-		 */
+		if(( $option == 'com_categories' || $option == 'com_sections' || $option == 'com_frontpage' )){
+		//Continue...
+		}else{
+		if ((int)$db->loadResult() < 1 )
+		return true;
+		}
+		*/
 		$query = "SELECT * FROM `#__community_acl_access` WHERE `option` = '{$option}' AND `name` = '###' AND `isbackend` = 1 AND ( `group_id` IN ( '".implode("','", $groups)."') OR `role_id` IN ( '".implode("','", $roles)."') )";
 		$db->setQuery($query);
 		$access = $db->loadObjectList();
 		/*if($option == 'com_categories'){
 		 //echo $db->getQuery().'<br>';die();
-		 }*/
+		}*/
 		$query = "SELECT `value` FROM `#__community_acl_config` WHERE `name` = 'default_action' ";
 		$db->setQuery($query);
 		$default_action = $db->loadResult();
@@ -482,4 +547,5 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		}
 		return ($default_action == 'deny' ? false : true);
 	}
+
 }
