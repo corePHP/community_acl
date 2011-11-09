@@ -3,7 +3,7 @@
 if (! defined ( '_COMMUNITY_ACL_ADMIN_HOME' )) {
 	define ( '_COMMUNITY_ACL_ADMIN_HOME', dirname ( __FILE__ ) );
 }
-define ( '_COMMUNITY_ACL_COMP_NAME', 'Community ACL ver 1.3.16' );
+define ( '_COMMUNITY_ACL_COMP_NAME', 'Community ACL ver 1.3.17' );
 require_once (JApplicationHelper::getPath ( 'admin_html' ));
 require_once (JApplicationHelper::getPath ( 'class' ));
 require_once (JApplicationHelper::getPath ( 'admin_functions' ));

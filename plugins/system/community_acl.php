@@ -943,7 +943,7 @@ class plgSystemCommunity_ACL extends JPlugin {
 				} elseif ($item->name != '###') {
 					//forbidden content, sections, categiries
 					if ($back_end) {
-						if ($option == 'com_content' && ($id == $item->value || in_array ( $item->value, $cid ))) {
+						if ('com_content' === $item->option && $option == 'com_content' && ($id == $item->value || in_array ( $item->value, $cid ))) {
 							if ($item->role_id == '0')
 								$fgroups [] = $item->group_id;
 							else
