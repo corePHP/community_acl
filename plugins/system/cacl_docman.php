@@ -26,7 +26,7 @@ class plgSystemCacl_docman extends JPlugin
         if ( ! $app->isSite() || 'com_docman' != $component ) {
             return;
         }
-                
+
         $catId = JSite::getMenu()->getParams( JRequest::getInt( 'Itemid' ) )->get( 'cat_id' );
         $catId = JRequest::getInt( 'gid', $catId );
         $documentId = JRequest::getInt( 'bid', null );

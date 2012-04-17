@@ -190,29 +190,29 @@ class plgSystemCacl_preprocessor extends JPlugin {
 	function findElement (&$element, $itemId, $value) {
 		switch ($this->_app->getTemplate()) {
 			case 'rt_panacea_j15':
-				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
+				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?'.preg_quote($value, '/').'.*?/', $element->value)) {
 					$this->_toRemove[] = $element->value;
 				}
 				break;
 			case 'yoo_symphony5.5':
-				if ($element->name == 'a' && false !== strpos($element->attribute ['href'], 'Itemid='.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
+				if ($element->name == 'a' && false !== strpos($element->attribute ['href'], 'Itemid='.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.preg_quote($value, '/').'<\/span>.*?/', $element->value)) {
 					$this->_toRemove[] = $element->getParent()->value;
 				}
 				break;
 			case 'yoo_enterprise':
-				if ($element->name == 'span' &&  1 === preg_match('/.*?'.$value.'.*?/', $element->value)) {
+				if ($element->name == 'span' &&  1 === preg_match('/.*?'.preg_quote($value, '/').'.*?/', $element->value)) {
 					$this->_toRemove[] = $element->value;
 				}
 				break;
 			case 'yoo_studio':
 				break;
 			case 'rt_missioncontrol_j15':
-				if ($element->name == 'li' && false === strpos($element->attribute['class'], 'root') && 1 === preg_match('/^<li[^>]*?><a[^>]*?href="[^"]*?option='.$value.'("|&){1}/', $element->value)) {
+				if ($element->name == 'li' && false === strpos($element->attribute['class'], 'root') && 1 === preg_match('/^<li[^>]*?><a[^>]*?href="[^"]*?option='.preg_quote($value, '/').'("|&){1}/', $element->value)) {
 					$this->_toRemove[] = $element->value;
 				}
 				break;
 			default:
-				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.$value.'<\/span>.*?/', $element->value)) {
+				if ($element->name == 'li' && false !== strpos($element->attribute ['class'], 'item'.$itemId) && 1 === preg_match('/.*?<span[^>]*>'.preg_quote($value, '/').'<\/span>.*?/', $element->value)) {
 				$this->_toRemove[] = $element->value;
 				return;
 			}
@@ -233,10 +233,10 @@ class plgSystemCacl_preprocessor extends JPlugin {
 		return version_compare(phpversion(), '5', '>=') && extension_loaded('tidy') && version_compare(phpversion('tidy'), '2', '>=') && $config->useTidy == 'true';
 	}
 	function backendMenuAccess () {
-		
+
 		$config = new CACL_config($db);
 		$config->load();
-		
+
 		$this->_app = JFactory::getApplication();
 		$user_access = cacl_get_user_access($config);
 		$db =& JFactory::getDBO();
