@@ -159,7 +159,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 
 					if(isset($pattern)){
 						foreach($xpath->query($pattern) as $node) {
-							if (!is_a($node,'DOMElement') || !$node->hasAttributes() || !is_a($node->parentNode,'DOMElement') || !$node->parentNode->hasAttributes() || !preg_match("/{$denyItem['id']}\b/",$node->getAttribute('class')) ){
+							if (!($node instanceof DOMElement) || !$node->hasAttributes() || !($node->parentNode instanceof DOMElement) || !$node->parentNode->hasAttributes() || !preg_match("/item{$denyItem['id']}\b/",$node->getAttribute('class')) ){
 								continue;
 							}
 							$node->parentNode->removeChild($node);
