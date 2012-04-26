@@ -189,6 +189,7 @@ class CACL_config extends JObject {
 	var $admin_redirect_url = 'index.php';
 	var $forbidden_content = 1;
 	var $useTidy = true;
+	var $useDom = NULL;
 	var $activate = 'site_administrator';
 	function __construct(&$db) {
 		//initialise
@@ -224,6 +225,7 @@ class CACL_config extends JObject {
 		$this->admin_redirect_url = 'index.php';
 		$this->forbidden_content = 1;
 		$this->useTidy = true;
+		$this->useDom = '0';
 		$this->activate = 'site_administrator';
 	}
 	function get($name = null) {

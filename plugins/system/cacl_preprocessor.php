@@ -134,17 +134,46 @@ class plgSystemCacl_preprocessor extends JPlugin {
 				);
 			}
 
+			$doDom =
+			version_compare(phpversion(), '5', '>=') &&
+			extension_loaded('dom') &&
+			@$config->useDom == 'true';
+			;
+
 			foreach ($denyList as $denyItem) {
 				if ($doTidy) {
 					$this->_toRemove = array();
 					$_html = @tidy_parse_string($_html, $config_options);
 					$this->findElement($_html->body(), $denyItem['id'], $denyItem['name']);
 					$_html = str_replace($this->_toRemove, '', $_html);
+				} elseif ($doDom){
+					// BUR 4/24/2012
+					$doc = new DOMDocument();
+					if( FALSE === @$doc->loadHTML($_html) ){
+						continue;
+					}
+					$xpath = new DOMXpath($doc);
+
+					// This will be the default for J1.5
+					$pattern = "//li[contains(@class,'item{$denyItem['id']}')]";
+
+					if(isset($pattern)){
+						foreach($xpath->query($pattern) as $node) {
+							if (!is_a($node,'DOMElement') || !$node->hasAttributes() || !is_a($node->parentNode,'DOMElement') || !$node->parentNode->hasAttributes() || !preg_match("/{$denyItem['id']}\b/",$node->getAttribute('class')) ){
+								continue;
+							}
+							$node->parentNode->removeChild($node);
+						}
+					}
+
+					$_html = $doc->saveHTML();
 				} else {
-					$denyItem = preg_quote($denyItem['name'], '/');
 					$id = preg_quote($denyItem['id'], '/');
+					$denyItem = preg_quote($denyItem['name'], '/');
 					$pattern = array();
-					if (false !== stripos($this->_app->getTemplate(), 'yoo_studio_5.5.3')) {
+					if (false !== stripos($this->_app->getTemplate(), 'rt_populus_j15')) {
+						$pattern[] = '/<li[^>]*item'.$id.'[^>]*><a[^>]*><span>'.$denyItem.'<\/span><\/a>(<ul>.*?<\/ul>)?<\/li>/';
+					} elseif (false !== stripos($this->_app->getTemplate(), 'yoo_studio_5.5.3')) {
 						$pattern = '/<li[^>]*?item'.$id.'[^>]*?>\s*<[span|a][^>]*>\s*<span[^>]*>\s*'.$denyItem.'\s*<\/span>\s*<\/[span|a]+>\s*<\/li>\s*/';
 						$_html = preg_replace($pattern, '', $_html);
 					} elseif (false !== stripos($this->_app->getTemplate(), 'yoo_studio')) {
@@ -172,10 +201,10 @@ class plgSystemCacl_preprocessor extends JPlugin {
 
 					if (!empty($pattern)) {
 
-						$tmpHtml = @preg_replace($pattern, '', $_html);
+						$tmpHtml = preg_replace($pattern, '', $_html);
 
 						if ( preg_last_error() !== PREG_NO_ERROR || $tmpHtml == NULL ){
-							JError::raiseError('100', JText::_('There was a problem with the cACL regular expressions. cacl_preprocessor.php: '.__LINE__));
+							JError::raiseError('100', JText::_('There was a problem with the cACL regular expressions. cacl_preprocessor.php: '.__LINE__.' '.preg_last_error()));
 						} else {
 							$_html = $tmpHtml;
 							unset($tmpHtml);
@@ -187,6 +216,7 @@ class plgSystemCacl_preprocessor extends JPlugin {
 
 		JResponse::setBody($_html);
 	}
+
 	function findElement (&$element, $itemId, $value) {
 		switch ($this->_app->getTemplate()) {
 			case 'rt_panacea_j15':

@@ -649,6 +649,21 @@ We need to allow managing module `Banners` only, so we should specify the follow
 		</table>
 		</fieldset>
 		<fieldset class="adminform">
+		<legend>DOM</legend>
+		<table class="adminform">
+                    <tr>
+                        <td>Enables the use of the DOM for menu parsing. If libTidy is on, it is chosen first. If your HTML is not well formed, this may not work.</td>
+                    </tr>
+			<tr>
+				<td valign="top">
+					<input type="hidden" name="useDom" value="<?php echo $config->useDom;?>" />
+					<label><input type="radio"  name="tmpDom" value="true" <?php echo ($config->useDom == 'true'? ' checked="checked" ': '');?> onchange="javascript: if (this.checked) document.adminForm.useDom.value = 'true'; else document.adminForm.useDom.value = 'false';" />Turn on DOM</label><br />
+					<label><input type="radio"  name="tmpDom" value="false" <?php echo ($config->useDom == 'false'? ' checked="checked" ': '');?> onchange="javascript: if (this.checked) document.adminForm.useDom.value = 'false'; else document.adminForm.useDom.value = 'true';" />Turn off DOM</label>
+				</td>
+			</tr>
+		</table>
+		</fieldset>
+		<fieldset class="adminform">
 		<legend>Activate</legend>
 		<table class="adminform">
                     <tr>
